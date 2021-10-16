@@ -1,11 +1,19 @@
 import React, { useState } from "react";
+import { GameProp, GameState } from "../@type/prop";
 import Board from "./Board";
+import HistoryList from "./HistoryList";
 
-const Game : React.FC = () => {
-    const [state, setState] = useState({
+
+
+const Game : React.FC<GameProp> = ({size}) => {
+    const [state, setState] = useState<GameState>({
         history: [
           {
-            squares: Array(9).fill(null)
+            squares: Array(size*size).fill(null),
+            position: {
+              row: -1,
+              col: -1
+            }
           }
         ],
         stepNumber: 0,
@@ -33,10 +41,11 @@ const Game : React.FC = () => {
     }
       
   
-    const handleClick = (i: number) => {
+    const handleClick = (row: number, col:number) => {
       const history = state.history.slice(0, state.stepNumber + 1);
       const current = history[history.length - 1];
       const squares = current.squares.slice();
+      let i = row * size + col;
       if (calculateWinner(squares) || squares[i]) {
         return;
       }
@@ -45,7 +54,11 @@ const Game : React.FC = () => {
         history: [
             ...history,
             {
-                squares: squares
+                squares: squares,
+                position: {
+                  row: row,
+                  col: col
+                }
             }
         ],
         stepNumber: history.length,
@@ -60,27 +73,15 @@ const Game : React.FC = () => {
         xIsNext: (step % 2) === 0
       });
     }
-  
-    const history = state.history;
-    const current = history[state.stepNumber];
-    const winner = calculateWinner(current.squares);
-
-    const moves = history.map((step, move) => {
-        const desc = move ?
-            'Go to move #' + move :
-            'Go to game start';
-        return (
-            <li key={move}>
-            <button onClick={() => jumpTo(move)}>{desc}</button>
-            </li>
-        );
-    });
+ 
+    const current = state.history[state.stepNumber];
 
     let status;
+    const winner = calculateWinner(current.squares);
     if (winner) {
-    status = "Winner: " + winner;
+      status = "Winner: " + winner;
     } else {
-    status = "Next player: " + (state.xIsNext ? "X" : "O");
+      status = "Next player: " + (state.xIsNext ? "X" : "O");
     }
 
     return (
@@ -88,12 +89,13 @@ const Game : React.FC = () => {
         <div className="game-board">
         <Board
             squares={current.squares}
-            onClick={(i:number) => handleClick(i)}
+            size = {size}
+            onClick={(row:number, col:number) => handleClick(row, col)}
         />
         </div>
         <div className="game-info">
         <div>{status}</div>
-        <ol>{moves}</ol>
+        <HistoryList data={state.history} onSelect={jumpTo}/>
         </div>
     </div>
     );

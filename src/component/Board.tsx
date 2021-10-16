@@ -1,33 +1,40 @@
 import Square from "./Square";
 import React from "react";
+import { BoardProp } from "../@type/prop";
 
 const Board: React.FC<BoardProp> = (props) => {
-    const renderSquare = (i: number) =>  {
+    const renderSquare = (row: number, col:number, size:number) =>  {
       return (
         <Square
-          value = {props.squares[i]}
-          onClick={() => props.onClick(i)}
+          value = {props.squares[row*size+col]}
+          onClick={() => props.onClick(row, col)}
         />
       );
+    }
+
+    const generateRow = (row: number, size: number) => {
+      let rowData = Array(size).fill(null)
+      for (let col = 0; col < size; ++col) {
+          rowData[col] = renderSquare(row, col, size)
+      }
+      return rowData;
+    }
+
+    const generateBoard = (size: number) => {
+      let boardData = Array(size).fill(null)
+      for (let row = 0; row < props.size; ++row) {
+        boardData[row] = (
+          <div className="board-row">
+            {generateRow(row, size)}
+          </div>
+        )
+      }
+      return boardData;
     }
   
     return (
         <div>
-          <div className="board-row">
-            {renderSquare(0)}
-            {renderSquare(1)}
-            {renderSquare(2)}
-          </div>
-          <div className="board-row">
-            {renderSquare(3)}
-            {renderSquare(4)}
-            {renderSquare(5)}
-          </div>
-          <div className="board-row">
-            {renderSquare(6)}
-            {renderSquare(7)}
-            {renderSquare(8)}
-          </div>
+          {generateBoard(props.size)}
         </div>
     );
 }

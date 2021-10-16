@@ -5,7 +5,7 @@ import Game from './component/Game';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Game />
+    <Game size={5}/>
   </React.StrictMode>,
   document.getElementById('root')
 );
