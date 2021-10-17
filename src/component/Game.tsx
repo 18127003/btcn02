@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { GameProp, GameState } from "../@type/prop";
+import { DRAW } from "../constant";
 import Board from "./Board";
 import HistoryList from "./HistoryList";
 
@@ -43,18 +44,29 @@ const Game : React.FC<GameProp> = ({size}) => {
         rightDiag
       ]
 
-      let winner:string|null = ""
+      if(row!==undefined && col!==undefined){
+        let position = row * size + col;
+        answers = answers.filter(answer=>answer.includes(position));
+      }
+
+      let winner:string|null = "";
+
       let isNotFound = answers.every(answer=>{
         let checkSet = answer.map(i=>squares[i])
         if (checkSet.every((val, i, arr)=>val===arr[0]&&val)){
-          console.log(checkSet)
           winner = checkSet[0]
           return false
         }
         return true
-      })
+      });
+
       if(!isNotFound){
         return winner
+      }
+
+      // check draw
+      if(answers.every(answer=>answer.map(i=>squares[i]).every(square=>square))){
+        return DRAW;
       }
       return null;
     }
@@ -96,9 +108,12 @@ const Game : React.FC<GameProp> = ({size}) => {
     const current = state.history[state.stepNumber];
 
     let status;
-    const winner = calculateWinner(current.squares);
-    if (winner) {
-      status = "Winner: " + winner;
+    const result = calculateWinner(current.squares);
+    if (result === DRAW){
+      status = "Draw"
+    }
+    else if (result) {
+      status = "Winner: " + result;
     } else {
       status = "Next player: " + (state.xIsNext ? "X" : "O");
     }
