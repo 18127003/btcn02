@@ -24,7 +24,7 @@ const Board: React.FC<BoardProp> = (props) => {
       let boardData = Array(size).fill(null)
       for (let row = 0; row < props.size; ++row) {
         boardData[row] = (
-          <div className="board-row">
+          <div className="board-row" key={row}>
             {generateRow(row, size)}
           </div>
         )

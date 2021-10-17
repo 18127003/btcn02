@@ -20,24 +20,43 @@ const Game : React.FC<GameProp> = ({size}) => {
         xIsNext: true
     });
 
-    const calculateWinner = (squares:(string|null)[]) => {
-        const lines = [
-          [0, 1, 2],
-          [3, 4, 5],
-          [6, 7, 8],
-          [0, 3, 6],
-          [1, 4, 7],
-          [2, 5, 8],
-          [0, 4, 8],
-          [2, 4, 6]
-        ];
-        for (let i = 0; i < lines.length; i++) {
-          const [a, b, c] = lines[i];
-          if (squares[a] && squares[a] === squares[b] && squares[a] === squares[c]) {
-            return squares[a];
-          }
+
+    const calculateWinner = (squares:(string|null)[], row?: number|undefined, col?:number|undefined) => {
+      // check row
+      let checkRows = Array<number[]>(size).fill(Array<number>(size).fill(0).map((v, i)=>v=i)).map((v, i)=>v.map(n=>n+=size*i))
+      let checkCols = Array<number[]>(size).fill(Array<number>(size).fill(0).map((v, i)=>v=i*size)).map((v, i)=>v.map(n=>n+=i))
+
+      // check diag
+      let leftDiag = Array<number>(size).fill(0)
+      for (let index = 1; index < leftDiag.length; index++) {
+        leftDiag[index] = leftDiag[index-1] + size + 1
+      }
+      let rightDiag = Array<number>(size).fill(size - 1)
+      for (let index = 1; index < leftDiag.length; index++) {
+        rightDiag[index] = rightDiag[index-1] + size - 1 
+      }
+
+      let answers = [
+        ...checkRows,
+        ...checkCols,
+        leftDiag,
+        rightDiag
+      ]
+
+      let winner:string|null = ""
+      let isNotFound = answers.every(answer=>{
+        let checkSet = answer.map(i=>squares[i])
+        if (checkSet.every((val, i, arr)=>val===arr[0]&&val)){
+          console.log(checkSet)
+          winner = checkSet[0]
+          return false
         }
-        return null;
+        return true
+      })
+      if(!isNotFound){
+        return winner
+      }
+      return null;
     }
       
   
@@ -46,7 +65,7 @@ const Game : React.FC<GameProp> = ({size}) => {
       const current = history[history.length - 1];
       const squares = current.squares.slice();
       let i = row * size + col;
-      if (calculateWinner(squares) || squares[i]) {
+      if (calculateWinner(squares, row, col) || squares[i]) {
         return;
       }
       squares[i] = state.xIsNext ? "X" : "O";
