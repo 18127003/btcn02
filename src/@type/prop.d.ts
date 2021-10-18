@@ -1,7 +1,7 @@
 
-
 type SquareProp = {
-    onClick: any,
+    id: number,
+    onClick: ()=>void,
     value: string|null,
     isHighlight: boolean
 }
@@ -14,11 +14,12 @@ type BoardProp = {
 }
 
 type GameProp = {
-    size: number
+    size: number,
+    winCriteria: number
 }
 
 type HistoryListProp = {
-    data: Move[],
+    data: HistoryStep[],
     onSelect: (move:number)=>void
 }
 

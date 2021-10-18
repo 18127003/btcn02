@@ -11,7 +11,7 @@ const Square: React.FC<SquareProp> = (props) => {
     }
 
     return (
-      <button className="square" onClick={props.onClick} >
+      <button className="square" onClick={props.onClick} key={props.id}>
         {renderValue()}
       </button>
     );

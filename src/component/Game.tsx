@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { Move } from "../@type/model";
 import { DRAW } from "../constant";
+import { calculateWinner } from "../util";
 import Board from "./Board";
 import HistoryList from "./HistoryList";
 
@@ -10,99 +10,70 @@ type GameState = {
   xIsNext: boolean
 }
 
-const Game : React.FC<GameProp> = ({size}) => {
-    const [histories, setHistories] = useState<Move[]>([
+const Game : React.FC<GameProp> = ({size, winCriteria}) => {
+    const [histories, setHistories] = useState<HistoryStep[]>([
       {
-        squares: Array<string|null>(size*size).fill(null),
-        position: {
-          row: -1,
-          col: -1
+        move: {
+          squares: Array<string|null>(size*size).fill(null),
+          position: {
+            row: -1,
+            col: -1
+          },
+          stepNumber: 0
         },
-        stepNumber: 0
-      },
+        result: undefined
+      }
     ]);
 
     const [currentStep, setCurrentStep] = useState<GameState>({
       stepNumber: 0,
       xIsNext: true
     });
-
-    const calculateWinner = (squares:(string|null)[], row?: number|undefined, col?:number|undefined) => {
-      // check row
-      let checkRows = Array<number[]>(size).fill(Array<number>(size).fill(0).map((v, i)=>v=i)).map((v, i)=>v.map(n=>n+=size*i))
-
-      // check col 
-      let checkCols = Array<number[]>(size).fill(Array<number>(size).fill(0).map((v, i)=>v=i*size)).map((v, i)=>v.map(n=>n+=i))
-
-      // check diag
-      let leftDiag = Array<number>(size).fill(0)
-      for (let index = 1; index < leftDiag.length; index++) {
-        leftDiag[index] = leftDiag[index-1] + size + 1
-      }
-      let rightDiag = Array<number>(size).fill(size - 1)
-      for (let index = 1; index < leftDiag.length; index++) {
-        rightDiag[index] = rightDiag[index-1] + size - 1 
-      }
-
-      let answers = [
-        ...checkRows,
-        ...checkCols,
-        leftDiag,
-        rightDiag
-      ]
-
-      if(row!==undefined && col!==undefined){
-        let position = row * size + col;
-        answers = answers.filter(answer=>answer.includes(position));
-      }
-
-      let winner:number[] = [];
-
-      let isNotFound = answers.every(answer=>{
-        let checkSet = answer.map(i=>squares[i])
-        if (checkSet.every((val, i, arr)=>val===arr[0]&&val)){
-          winner = answer;
-          return false;
-        }
-        return true;
-      });
-
-      if(!isNotFound){
-        return winner
-      }
-
-      // check draw
-      if(answers.every(answer=>answer.map(i=>squares[i]).every(square=>square))){
-        return DRAW;
-      }
-      return [];
-    }
-      
   
     const handleClick = (row: number, col:number) => {
-      const current = histories.slice(-1)[0];
-      const squares = current.squares.slice();
+      const modifiedHistories = histories.slice(0, currentStep.stepNumber+1);
+      const current = modifiedHistories.slice(-1)[0];
+      const squares = current.move.squares.slice();
       let i = row * size + col;
-      if (calculateWinner(squares, row, col).length > 0 || squares[i]) {
+      if (current.result || squares[i]) {
         return;
       }
-      squares[i] = currentStep.xIsNext ? "X" : "O";
-      
+      let currentPlayer = currentStep.xIsNext ? "X" : "O";
+      squares[i] = currentPlayer;
+
+      let checkWinner = calculateWinner(squares, row, col, size, winCriteria)
+      let result: Result|undefined = undefined;
+
+      if (typeof checkWinner === "string"){
+        result = {
+          result: DRAW,
+          line: []
+        }
+      } else if (checkWinner.length > 0){
+        result = {
+          result: currentPlayer,
+          line: checkWinner
+        }
+      }
+
       setHistories(
         [
-            ...histories,
+            ...modifiedHistories,
             {
+              move: {
                 squares: squares,
                 position: {
                   row: row,
                   col: col
                 },
-                stepNumber: histories.length++
-            }
+                stepNumber: modifiedHistories.length++
+              },
+              result: result
+            } 
         ]
       );
       setCurrentStep({
-        stepNumber: histories.length-1,
+        stepNumber: modifiedHistories.length-1,
         xIsNext: !currentStep.xIsNext
       });
     }
@@ -113,35 +84,30 @@ const Game : React.FC<GameProp> = ({size}) => {
         xIsNext: (step % 2) === 0
       });
     }
-
-    const reverseMove = () => {
-      setHistories(
-        [...histories.reverse(),]
-      )
-    }
  
-    let current = histories.find(history=>history.stepNumber===currentStep.stepNumber);
+    let current = histories.find(history=>history.move.stepNumber===currentStep.stepNumber);
     if(current===undefined){
       current = histories.slice(-1)[0]
     }
     let status: string;
     let winner : number[] = [];
-    const result = calculateWinner(current.squares);
-    if (result === DRAW){
+    const result = current.result;
+    if(result === undefined){
+      status = "Next player: " + (currentStep.xIsNext ? "X" : "O");
+    }
+    else if (result.result === DRAW){
       status = "Draw"
     }
-    else if (result.length > 0) {
-      status = "Winner: " + result[0];
-      winner = result;
-    } else {
-      status = "Next player: " + (currentStep.xIsNext ? "X" : "O");
+    else {
+      status = "Winner: " + result.result;
+      winner = result.line;
     }
 
     return (
       <div className="game">
           <div className="game-board">
           <Board
-              squares={current.squares}
+              squares={current.move.squares}
               size = {size}
               onClick={(row:number, col:number) => handleClick(row, col)}
               winner = {winner}
@@ -149,13 +115,9 @@ const Game : React.FC<GameProp> = ({size}) => {
           </div>
           <div className="game-info">
           <div>{status}</div> 
-          <button onClick={()=>reverseMove()}>
-            Change order
-          </button>
           <HistoryList data={histories} onSelect={jumpTo}/>
           </div>
       </div>
-      
     );
   
 }

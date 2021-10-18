@@ -5,6 +5,7 @@ const Board: React.FC<BoardProp> = (props) => {
     const renderSquare = (row: number, col:number, size:number) =>  {
       return (
         <Square
+          id = {row*size+col}
           value = {props.squares[row*size+col]}
           onClick={() => props.onClick(row, col)}
           isHighlight = {props.winner.includes(row*size+col)}
