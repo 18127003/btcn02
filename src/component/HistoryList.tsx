@@ -1,21 +1,20 @@
 import React, { useState } from "react";
-import { HistoryListProp } from "../@type/prop";
 
 const HistoryList: React.FC<HistoryListProp> = ({data, onSelect})=>{
     const [current, setCurrent] = useState<number>(data.length-1)
-    const  moves = data.map((step, move) => {
-        
-        const desc = move ?
-            `Go to move #${move} (${step.position?.col}, ${step.position?.row})` :
+    const  moves = data.map((step) => {
+        const stepNumber = step.stepNumber
+        const desc = stepNumber?
+            `Go to move #${stepNumber} (${step.position?.col}, ${step.position?.row})` :
             'Go to game start';
         return (
-            <li key={move}>
+            <li key={stepNumber}>
             <button 
                 onClick={()=>{
-                    onSelect(move)
-                    setCurrent(move)
+                    onSelect(stepNumber)
+                    setCurrent(stepNumber)
                 }}
-                style = {move===current?{fontWeight: "bold"}:{}}
+                style = {stepNumber===current?{fontWeight: "bold"}:{}}
             >
                     {desc}
             </button>

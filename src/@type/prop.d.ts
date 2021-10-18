@@ -1,14 +1,16 @@
-import { type } from "os"
+
 
 type SquareProp = {
     onClick: any,
-    value: string|null
+    value: string|null,
+    isHighlight: boolean
 }
 
 type BoardProp = {
     squares: (string|null)[],
     size: number,
-    onClick: (row:number, col:number)=>void
+    onClick: (row:number, col:number)=>void,
+    winner: number[]
 }
 
 type GameProp = {
@@ -16,20 +18,7 @@ type GameProp = {
 }
 
 type HistoryListProp = {
-    data: History[],
+    data: Move[],
     onSelect: (move:number)=>void
 }
 
-type History = {
-    squares: (string|null)[],
-    position: {
-      row: number,
-      col: number
-    }
-} 
-  
-type GameState = {
-    history: History[],
-    stepNumber: number,
-    xIsNext: boolean
-}

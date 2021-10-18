@@ -1,6 +1,5 @@
 import Square from "./Square";
 import React from "react";
-import { BoardProp } from "../@type/prop";
 
 const Board: React.FC<BoardProp> = (props) => {
     const renderSquare = (row: number, col:number, size:number) =>  {
@@ -8,6 +7,7 @@ const Board: React.FC<BoardProp> = (props) => {
         <Square
           value = {props.squares[row*size+col]}
           onClick={() => props.onClick(row, col)}
+          isHighlight = {props.winner.includes(row*size+col)}
         />
       );
     }
@@ -22,7 +22,7 @@ const Board: React.FC<BoardProp> = (props) => {
 
     const generateBoard = (size: number) => {
       let boardData = Array(size).fill(null)
-      for (let row = 0; row < props.size; ++row) {
+      for (let row = 0; row < size; ++row) {
         boardData[row] = (
           <div className="board-row" key={row}>
             {generateRow(row, size)}
