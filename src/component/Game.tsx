@@ -115,7 +115,7 @@ const Game : React.FC<GameProp> = ({size, winCriteria}) => {
           </div>
           <div className="game-info">
           <div>{status}</div> 
-          <HistoryList data={histories} onSelect={jumpTo}/>
+          <HistoryList data={histories} onSelect={jumpTo} selected={currentStep.stepNumber}/>
           </div>
       </div>
     );

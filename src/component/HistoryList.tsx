@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 
-const HistoryList: React.FC<HistoryListProp> = ({data, onSelect})=>{
-    const [current, setCurrent] = useState<number>(data.length-1)
+const HistoryList: React.FC<HistoryListProp> = ({data, onSelect, selected})=>{
 
     const [isReverse, setReverse] = useState(false)
 
@@ -22,9 +21,8 @@ const HistoryList: React.FC<HistoryListProp> = ({data, onSelect})=>{
             <button 
                 onClick={()=>{
                     onSelect(stepNumber)
-                    setCurrent(stepNumber)
                 }}
-                style = {stepNumber===current?{fontWeight: "bold"}:{}}
+                style = {stepNumber===selected?{fontWeight: "bold"}:{}}
             >
                     {desc}
             </button>

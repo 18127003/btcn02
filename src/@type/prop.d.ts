@@ -20,6 +20,7 @@ type GameProp = {
 
 type HistoryListProp = {
     data: HistoryStep[],
+    selected: number = 0,
     onSelect: (move:number)=>void
 }
 
