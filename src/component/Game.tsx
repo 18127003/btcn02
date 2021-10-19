@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { DRAW } from "../constant";
+import { DRAW, PLAYER_O, PLAYER_X } from "../constant";
 import { calculateWinner } from "../util";
 import Board from "./Board";
 import HistoryList from "./HistoryList";
@@ -38,23 +38,10 @@ const Game : React.FC<GameProp> = ({size, winCriteria}) => {
       if (current.result || squares[i]) {
         return;
       }
-      let currentPlayer = currentStep.xIsNext ? "X" : "O";
+      let currentPlayer = currentStep.xIsNext ? PLAYER_X : PLAYER_O;
       squares[i] = currentPlayer;
 
-      let checkWinner = calculateWinner(squares, row, col, size, winCriteria)
-      let result: Result|undefined = undefined;
-
-      if (typeof checkWinner === "string"){
-        result = {
-          result: DRAW,
-          line: []
-        }
-      } else if (checkWinner.length > 0){
-        result = {
-          result: currentPlayer,
-          line: checkWinner
-        }
-      }
+      let result = calculateWinner(squares, row, col, size, winCriteria)
 
       setHistories(
         [
@@ -93,7 +80,7 @@ const Game : React.FC<GameProp> = ({size, winCriteria}) => {
     let winner : number[] = [];
     const result = current.result;
     if(result === undefined){
-      status = "Next player: " + (currentStep.xIsNext ? "X" : "O");
+      status = "Next player: " + (currentStep.xIsNext ? PLAYER_X : PLAYER_O);
     }
     else if (result.result === DRAW){
       status = "Draw"
@@ -106,16 +93,20 @@ const Game : React.FC<GameProp> = ({size, winCriteria}) => {
     return (
       <div className="game">
           <div className="game-board">
-          <Board
+            <Board
               squares={current.move.squares}
               size = {size}
               onClick={(row:number, col:number) => handleClick(row, col)}
               winner = {winner}
-          />
+            />
           </div>
           <div className="game-info">
-          <div>{status}</div> 
-          <HistoryList data={histories} onSelect={jumpTo} selected={currentStep.stepNumber}/>
+            <div>{status}</div> 
+            <HistoryList 
+              data={histories} 
+              onSelect={jumpTo} 
+              selected={currentStep.stepNumber}
+            />
           </div>
       </div>
     );

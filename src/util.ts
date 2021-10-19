@@ -1,4 +1,4 @@
-import { DRAW } from "./constant";
+import { DRAW, PLAYER_X } from "./constant";
 
 export const hasConsecutive = (arr: number[], cons: number, pad: number, from?: number) => {
     if (cons > arr.length){
@@ -24,28 +24,32 @@ export const hasConsecutive = (arr: number[], cons: number, pad: number, from?: 
     return undefined;
 }
 
-export const calculateWinner = (squares:(string|null)[], row: number, col:number, size: number, winCriteria: number) => {
+export const calculateWinner = (squares:(string|null)[], row: number, col:number, size: number, winCriteria: number): Result|undefined => {
     let winner:number[]|undefined;
-    const currentPlayer = squares[row * size +col]
+    const currentPlayer = squares[row * size + col]??PLAYER_X
 
     // check row
     let checkRow = Array<number>(size).fill(0).map((v, i)=>v = row * size + i)
       .filter(n=>squares[n]===currentPlayer)
-    // console.log(checkRow)
 
     winner = hasConsecutive(checkRow, winCriteria, 1)
     if(winner) {
-      return winner;
+      return {
+        result: currentPlayer,
+        line: winner
+      };
     }
 
     // check col 
     let checkCol = Array<number>(size).fill(0).map((v, i)=>v = col + i * size)
       .filter(n=>squares[n]===currentPlayer)
-    // console.log(checkCol)
 
     winner = hasConsecutive(checkCol, winCriteria, size)
     if(winner) {
-      return winner;
+      return {
+        result: currentPlayer,
+        line: winner
+      };
     }
 
     // check diag
@@ -56,11 +60,13 @@ export const calculateWinner = (squares:(string|null)[], row: number, col:number
       checkLeftDiag = checkLeftDiag.map((v,i) => v = i * size + i + col - row)
     }
     checkLeftDiag = checkLeftDiag.filter(n=>squares[n]===currentPlayer)
-    // console.log(checkLeftDiag)
 
     winner = hasConsecutive(checkLeftDiag, winCriteria, size + 1)
     if(winner) {
-      return winner;
+      return {
+        result: currentPlayer,
+        line: winner
+      };
     }
 
     let checkRightDiag = Array<number>(size - Math.abs(col+row+1-size)).fill(0)
@@ -70,16 +76,21 @@ export const calculateWinner = (squares:(string|null)[], row: number, col:number
       checkRightDiag = checkRightDiag.map((v,i)=> v = (i + col + row - size + 2) * size - i - 1)
     }
     checkRightDiag = checkRightDiag.filter(n=>squares[n]===currentPlayer)
-    console.log(checkRightDiag)
 
     winner = hasConsecutive(checkRightDiag, winCriteria, size - 1)
     if(winner) {
-      return winner;
+      return {
+        result: currentPlayer,
+        line: winner
+      };
     }
 
     // check draw
     if(squares.every(square=>square)){
-      return DRAW;
+      return {
+        result: DRAW,
+        line: []
+      };
     }
-    return [];
+    return undefined;
 }

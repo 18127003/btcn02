@@ -16,6 +16,11 @@ ol, ul {
   padding-left: 30px;
 }
 
+.game-board {
+  margin-left: 5px;
+  margin-top: 5px;
+}
+
 .board-row:after {
   clear: both;
   content: "";
