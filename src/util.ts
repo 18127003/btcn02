@@ -27,7 +27,6 @@ export const hasConsecutive = (arr: number[], cons: number, pad: number, from?: 
 export const calculateWinner = (squares:(string|null)[], row: number, col:number, size: number, winCriteria: number): Result|undefined => {
     let winner:number[]|undefined;
     const currentPlayer = squares[row * size + col]??PLAYER_X
-
     // check row
     let checkRow = Array<number>(size).fill(0).map((v, i)=>v = row * size + i)
       .filter(n=>squares[n]===currentPlayer)

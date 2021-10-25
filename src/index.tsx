@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
-import Game from './component/Game';
+import GameManager from './component/GameManager';
 
 ReactDOM.render(
   <React.StrictMode>
-    <Game size={10} winCriteria={5}/>
+    <GameManager />
   </React.StrictMode>,
   document.getElementById('root')
 );

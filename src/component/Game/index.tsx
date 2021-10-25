@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DRAW, PLAYER_O, PLAYER_X } from "../../constant";
 import { calculateWinner } from "../../util";
 import Board from "../Board";
@@ -11,6 +11,7 @@ type GameState = {
 }
 
 const Game : React.FC<GameProp> = ({size, winCriteria}) => {
+  
     const [histories, setHistories] = useState<HistoryStep[]>([
       {
         move: {
@@ -29,6 +30,26 @@ const Game : React.FC<GameProp> = ({size, winCriteria}) => {
       stepNumber: 0,
       xIsNext: true
     });
+
+    useEffect(()=>{
+      setHistories([
+        {
+          move: {
+            squares: Array<string|null>(size*size).fill(null),
+            position: {
+              row: -1,
+              col: -1
+            },
+            stepNumber: 0
+          },
+          result: undefined
+        }
+      ])
+      setCurrentStep({
+        stepNumber: 0,
+        xIsNext: true
+      })
+    },[size, winCriteria])
   
     const handleClick = (row: number, col:number) => {
       const modifiedHistories = histories.slice(0, currentStep.stepNumber+1);
@@ -40,9 +61,7 @@ const Game : React.FC<GameProp> = ({size, winCriteria}) => {
       }
       let currentPlayer = currentStep.xIsNext ? PLAYER_X : PLAYER_O;
       squares[i] = currentPlayer;
-
       let result = calculateWinner(squares, row, col, size, winCriteria)
-
       setHistories(
         [
             ...modifiedHistories,
@@ -79,6 +98,7 @@ const Game : React.FC<GameProp> = ({size, winCriteria}) => {
     let status: string;
     let winner : number[] = [];
     const result = current.result;
+    
     if(result === undefined){
       status = "Next player: " + (currentStep.xIsNext ? PLAYER_X : PLAYER_O);
     }
