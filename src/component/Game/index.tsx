@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { DRAW, PLAYER_O, PLAYER_X } from "../constant";
-import { calculateWinner } from "../util";
-import Board from "./Board";
-import HistoryList from "./HistoryList";
+import { DRAW, PLAYER_O, PLAYER_X } from "../../constant";
+import { calculateWinner } from "../../util";
+import Board from "../Board";
+import HistoryList from "../Board/HistoryList";
 
   
 type GameState = {
